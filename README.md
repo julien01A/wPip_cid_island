@@ -1,4 +1,4 @@
-# WO_cid_island
+# wPip_cid_island
 
 ### wPip phylogeny
 We used sequences of five MLST genes from Atyame et al. (2011) (<doi:10.1093/molbev/msr083>) which we compared to sequences from the wPip Pel-JHB-and-Molestus reference genomes, as well as our Harash sequences (the Slab and Tunis sequences were those from Atyame et al.). First, sequences of the pk1, pk2, MutL, GP12, and GP15 genes were independently aligned using Clustal Omega (<doi:10.1002/pro.3290>) implemented in Unipro UGENE (<doi:10.1093/bioinformatics/bts091>), and concatenated into a .fasta file named ```wPip_strain_alignment.fasta```. 
