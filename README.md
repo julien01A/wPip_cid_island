@@ -13,7 +13,7 @@ raxml-ng --all --msa wPip_strain_alignment.fasta --model HKY+I+G4 --prefix wPip_
 Finally, the phylogenetic tree was visualized and modified using figtree (<https://github.com/rambaut/figtree/>) and MEGA7 (<https://megasoftware.net/>)
 
 ### srWO phylogeny
-Recombinase sequences used by Bordenstein & Bordenstein (2022) (<doi:10.1371/journal.pgen.1010227>) were recovered to determine which srWO type were our new wPip prophage sequences. We aligned knwown-srWO type recombinases with wPip Pel-and-JHB recombinases, as well as our Harash and Tunis prophage recombinases, and included it in a .faa file named ```srWO_alignment.faa```.
+Recombinase sequences used by Bordenstein & Bordenstein (2022) (<doi:10.1371/journal.pgen.1010227>) were recovered to determine which srWO type were our new wPip prophage sequences. We aligned knwown-srWO type recombinases with wPip Pel-and-JHB recombinases, as well as our Tunis, Slab and Harash prophage recombinases, and included it in a .faa file named ```srWO_alignment.faa```.
 The best ML substitution model and the phylogenetic tree were then created:
 ```
 modeltest-ng -i srWO_alignment.faa -p 12 -T raxml -d aa
