@@ -45,7 +45,7 @@ iu-remove-ids-from-fastq -i fastq_pass/FBF16085_pass_all.fastq.gz -l FBF16085_ID
 mv fastq_pass/FBF16085_pass_all.fastq.gz.survived fastq_pass/FBF16085_no_culpip.fastq.gz
 ```
 
-Here is a synthesis of the raw sequencing reads' nature of the Harash line:
+Here is a synthesis of the raw sequencing reads' nature of the Harash line as example:
 
 ```
 # Total number of reads processed: XXXX (Total number of raw sequencing reads)
