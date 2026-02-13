@@ -56,15 +56,46 @@ Here is a synthesis of the raw sequencing reads' nature of the Harash line as ex
 
 #### Step 2. Select the reads mapped to Wolbachia wPip
 
-We mapped the remaining reads longer than 10 kb onto our proephage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d.
+We mapped the remaining reads longer than 10 kb onto our prophage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d. Here is the example for Harash reads:
 
 ```
 ####bash####
+# Pool the four harashp_*.fasta contigs into a single fasta file, then reformate it for further analyse
+awk 'FNR==1{print ""}1' Harashp_*.fasta > Harashp_ALL.fasta
+awk '/^>/ {print; next} {gsub(/[RYSWKMBDHV-]/,"N"); print}' Harashp_ALL.fasta > Harashp_ALL_1.fasta
+awk '/^>/{skip=seen[$0]++} !skip' Harashp_ALL_1.fasta > Harashp_ALL.fasta
+rm Harashp_ALL_1.fasta
+
+# Subselect reads longer than 10kb
+seqkit seq -m 10000 fastq_pass/FBF16085_no_culpip.fastq.gz > FBF16085_no_culpip_10kb.fastq
+
+# Map the subselect reads longer than 10kb to the Harashp_* contigs
+minimap2 -ax map-ont -a Harashp_ALL.fasta FBF16085_no_culpip_10kb.fastq --sam-hit-only > FBF16085_no_culpip_10kb_on_Harashp.sam
+
+# Extract the IDs of reads mapped to Harashp_* contigs
+samtools view FBF16085_no_culpip_10kb_on_Harashp.sam | cut -f 1 > FBF16085_no_culpip_10kb_on_Harashp_IDs.txt
+sort FBF16085_no_culpip_10kb_on_Harashp_IDs.txt | uniq > FBF16085_no_culpip_10kb_on_Harashp_IDs_unique.txt
+
+# Extract the harashp-matches reads from the subselected data 
+seqtk subseq FBF16085_no_culpip_10kb.fastq FBF16085_no_culpip_10kb_on_Harashp_IDs_unique.txt > FBF16085_no_culpip_10kb_on_Harashp_IDs_unique.fastq
+```
+
+Here are the commands and synthesis of the remaining reads longer than 10 kb matching with the Harashp contigs:
+
+```
+####bash####
+wc -l FBF16085_no_culpip_10kb_on_Harashp_IDs_unique.txt
+
+# Total reads longer than 10kb mapping on Harashp contigs: 1,743
+# Mapped on Harashp_a                                    :
+# Mapped on Harashp_b                                    :
+# Mapped on Harashp_c                                    :
+# Mapped on Harashp_d                                    : 
 ```
 
 ### wPip phylogeny
 
-We used sequences of five MLST genes from Atyame et al. (2011) (<https://doi.org/10.1093/molbev/msr083>) which we compared to sequences from the wPip Pel-JHB-and-Molestus reference genomes, as well as our Harash sequences (the Slab and Tunis sequences were those from Atyame et al.). First, sequences of the pk1, pk2, MutL, GP12, and GP15 genes were independently aligned using `Clustal Omega` (Sievers and Higgins, 2017, <https://doi.org/10.1002/pro.3290>) implemented in `Unipro UGENE` (Okonechnikov et al, 2012, <https://doi.org/10.1093/bioinformatics/bts091>), and concatenated into a .fasta file named `wPip_strain_alignment.fasta`. Next, substitution models were evaluated using `modeltest (v.0.1.7)` (Darriba et al, 2019, <https://doi.org/10.1093/molbev/msz189>) to determine the most appropriate ML substitution model (based on the AICc criterion) for phylogenetic tree construction with `raxml-ng (v.1.1.0)` (Kozlov et al, 2019, <https://doi.org/10.1093/bioinformatics/btz305>):
+We used sequences of five MLST genes from Atyame et al. (2011) (<https://doi.org/10.1093/molbev/msr083>) which we compared to sequences from the wPip Pel-JHB-and-Mol reference genomes, as well as our Harash sequences (the Slab and Tunis sequences were those from Atyame et al.). First, sequences of the pk1, pk2, MutL, GP12, and GP15 genes were independently aligned using `Clustal Omega` (Sievers and Higgins, 2017, <https://doi.org/10.1002/pro.3290>) implemented in `Unipro UGENE` (Okonechnikov et al, 2012, <https://doi.org/10.1093/bioinformatics/bts091>), and concatenated into a .fasta file named `wPip_strain_alignment.fasta`. Next, substitution models were evaluated using `modeltest (v.0.1.7)` (Darriba et al, 2019, <https://doi.org/10.1093/molbev/msz189>) to determine the most appropriate ML substitution model (based on the AICc criterion) for phylogenetic tree construction with `raxml-ng (v.1.1.0)` (Kozlov et al, 2019, <https://doi.org/10.1093/bioinformatics/btz305>):
 
 ```
 modeltest-ng -i wPip_strain_alignment.fasta -p 12 -T raxml -d nt
