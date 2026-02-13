@@ -28,7 +28,7 @@ bbmap.sh ref=ref_culpip.fasta in=wPipPel_shredded.fa outm=culpip_to_wPipPel_mapp
 bbmask.sh in=ref_culpip.fasta out=culpip_masked.fa entropy=0.7 sam=culpip_to_wPipPel_mapped.sam threads=10
 ```
 
-Then, we used `Minimap2 (v.2.24)` (Li, 2018, <https://doi.org/10.1093/bioinformatics/bty191>, <https://github.com/lh3/minimap2>) and `samtools (v.1.9)` (<https://github.com/samtools/samtools>) to map the raw sequencing reads onto `culpip_masked.fa` and remove the mapped reads for downstream analyses:
+Then, we used `Minimap2 (v.2.24)` (Li, 2018, <https://doi.org/10.1093/bioinformatics/bty191>, <https://github.com/lh3/minimap2>), `samtools (v.1.9)` (<https://github.com/samtools/samtools>) and anvi'o (v.8) (Eren et al, 2020, <https://doi.org/10.1038/s41564-020-00834-3>, <https://anvio.org/>) to map the raw sequencing reads onto `culpip_masked.fa` and remove the mapped reads for downstream analyses:
 
 ```
 ####bash####
