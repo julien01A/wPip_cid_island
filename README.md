@@ -41,16 +41,16 @@ samtools view FBF16085_to_culpip_masked.sam | cut -f 1 > FBF16085_IDs_to_remove_
 # Remove from the FASTQ all reads whose ID is in the list (here, those mapped to culpip_masked)
 iu-remove-ids-from-fastq -i fastq_pass/FBF16085_pass_all.fastq.gz -l FBF16085_IDs_to_remove_culpip.txt -d " "
 
-# Rename the FASTQ containing the reads remaining after removing culpip
+# Rename the FASTQ containing the reads remaining after removing culpip_masked
 mv fastq_pass/FBF16085_pass_all.fastq.gz.survived fastq_pass/FBF16085_no_culpip.fastq.gz
 ```
 
 Here is a synthesis of the raw sequencing reads' nature of the Harash line as example:
 
 ```
-# Total number of reads processed: XXXX (Total number of raw sequencing reads)
-# Number of reads removed        : XXXX (Total number of reads mapping on "culpip_masked.fa")
-# Remaining reads: XXXX
+# Total number of reads processed: 2,475,160 (Total number of raw sequencing reads)
+# Number of reads removed        : 2,132,771 (Total number of reads mapping on "culpip_masked.fa")
+# Remaining reads                : 342,389
 ```
 
 
