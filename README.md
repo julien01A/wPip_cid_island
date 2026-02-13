@@ -38,7 +38,7 @@ minimap2 -ax map-ont -a culpip_masked.fa --sam-hit-only fastq_pass/FBF16085_pass
 # Extract the IDs of reads mapped to to_culpip_masked so they can be removed later
 samtools view FBF16085_to_culpip_masked.sam | cut -f 1 > FBF16085_IDs_to_remove_culpip.txt
 
-# Remove from the FASTQ all reads whose ID is in the list (here, those mapped to culpip)
+# Remove from the FASTQ all reads whose ID is in the list (here, those mapped to culpip_masked)
 iu-remove-ids-from-fastq -i fastq_pass/FBF16085_pass_all.fastq.gz -l FBF16085_IDs_to_remove_culpip.txt -d " "
 
 # Rename the FASTQ containing the reads remaining after removing culpip
