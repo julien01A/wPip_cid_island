@@ -11,7 +11,7 @@ Prepare the files usefull for mapping:
 # Pool all the sequencing .fastq.gz files together
 cat *.fastq.gz > FBF16085_pass_all.fastq.gz
 # importe a reference genome of Culex pipiens. Here: GCA_041146695.1, renamed "ref_culpip.fasta"
-#  importe a reference genome of Wolbachia wPip : Here: NC_010981.1, renamed "wPipPel.fasta"
+# importe a reference genome of Wolbachia wPip : Here: NC_010981.1, renamed "wPipPel.fasta"
 ```
 
 To best prepare for mapping the raw sequencing reads onto a clean host Culex pipiens genome, we create a subset of sequences from `ref_culpip.fasta` that are not also found in Wolbachia wPip. Here is the script used to generate the subset dataset `culpip_masked.fa`:
@@ -71,26 +71,41 @@ seqkit seq -m 10000 fastq_pass/FBF16085_no_culpip.fastq.gz > FBF16085_no_culpip_
 
 # Map the subselect reads longer than 10kb to the Harashp_* contigs
 minimap2 -ax map-ont -a Harashp_ALL.fasta FBF16085_no_culpip_10kb.fastq --sam-hit-only > FBF16085_no_culpip_10kb_on_Harashp.sam
+# .sam to .bam
+samtools view -bS FBF16085_no_culpip_10kb_on_Harashp.sam -o FBF16085_no_culpip_10kb_on_Harash-raw.bam
 
-# Extract the IDs of reads mapped to Harashp_* contigs
-samtools view FBF16085_no_culpip_10kb_on_Harashp.sam | cut -f 1 > FBF16085_no_culpip_10kb_on_Harashp_IDs.txt
-sort FBF16085_no_culpip_10kb_on_Harashp_IDs.txt | uniq > FBF16085_no_culpip_10kb_on_Harashp_IDs_unique.txt
+# Filter the BAM file to keep only reads with mapping quality ≥ 2
+samtools view -bq 2 FBF16085_no_culpip_10kb_on_Harash-raw.bam > FBF16085_no_culpip_10kb_on_Harash_quality.bam
 
-# Extract the harashp-matches reads from the subselected data 
-seqtk subseq FBF16085_no_culpip_10kb.fastq FBF16085_no_culpip_10kb_on_Harashp_IDs_unique.txt > FBF16085_no_culpip_10kb_on_Harashp_IDs_unique.fastq
+# Extract read IDs mapped to reference "Harashp_*" from the filtered BAM file. Keep only unique read IDs and save them into a text file
+samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '$3=="Harashp_a" {print $1}' | sort -u > Harashp_a_IDs.txt
+seqkit grep -f Harashp_a_IDs.txt FBF16085_no_culpip_10kb.fastq | seqkit fq2fa > Harashp_a_reads.fasta
+grep -o ">" Harashp_a_reads.fasta | wc -l
+
+samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '$3=="Harashp_b" {print $1}' | sort -u > Harashp_b_IDs.txt
+seqkit grep -f Harashp_b_IDs.txt FBF16085_no_culpip_10kb.fastq | seqkit fq2fa > Harashp_b_reads.fasta
+grep -o ">" Harashp_b_reads.fasta | wc -l
+
+samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '$3=="Harashp_c" {print $1}' | sort -u > Harashp_c_IDs.txt
+seqkit grep -f Harashp_c_IDs.txt FBF16085_no_culpip_10kb.fastq | seqkit fq2fa > Harashp_c_reads.fasta
+grep -o ">" Harashp_c_reads.fasta | wc -l
+
+samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '$3=="Harashp_d" {print $1}' | sort -u > Harashp_d_IDs.txt
+seqkit grep -f Harashp_d_IDs.txt FBF16085_no_culpip_10kb.fastq | seqkit fq2fa > Harashp_d_reads.fasta
+grep -o ">" Harashp_d_reads.fasta | wc -l
 ```
 
 Here are the commands and synthesis of the remaining reads longer than 10 kb matching with the Harashp contigs:
 
 ```
 ####bash####
-wc -l FBF16085_no_culpip_10kb_on_Harashp_IDs_unique.txt
+samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '{print $1"\t"$3}' | sort -u | cut -f2 | sort | uniq -c
 
-# Total reads longer than 10kb mapping on Harashp contigs: 1,743
-# Mapped on Harashp_a                                    :
-# Mapped on Harashp_b                                    :
-# Mapped on Harashp_c                                    :
-# Mapped on Harashp_d                                    : 
+# Mapped on Harashp_a                                    : 504
+# Mapped on Harashp_b                                    : 92
+# Mapped on Harashp_c                                    : 475
+# Mapped on Harashp_d                                    : 407
+# Total reads longer than 10kb mapping on Harashp contigs: 1,478
 ```
 
 ### wPip phylogeny
