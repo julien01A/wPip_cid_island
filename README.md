@@ -1,8 +1,58 @@
-# wPip_cid_island
+# Genomic Islands in *Wolbachia* Prophages Drive Amplification and Diversification of Cytoplasmic Incompatibility Genes in *Culex pipiens*
 
-### Mapping of Nanopore longreads on contigs
+This repository accompanies the manuscript investigating the genomic environment of the cytoplasmic incompatibility factor (*cif*) genes in several *w*Pip strains of *Wolbachia*, the endosymbiotic bacterium infecting mosquitoes of the *Culex* complex.
 
-#### Step 1. Remove the reads of the host *Culex pipiens*
+The study aimed to characterize the genomic context and identify key genes flanking the *cif* loci in *w*Pip strains by analyzing Nanopore long reads polished with Illumina short reads. As *de novo* assembly attempts were unsuccessful for circularization of chromosome, we performed a manual analysis of polished Nanopore reads mapped against the *cif* genes.
+
+This GitHub repository provides the main commands, scripts, and key intermediate files used throughout the analyses.
+
+## 1. *De novo* assembly
+
+## 2. Selection of Nanopore polished reads by mapping *cif* genes
+
+## 3. Identification of *cif* variants in the Nanopore polished reads: *cinA-cinB* monomorphy and *cidA-cidB* variants
+
+## 4. Annotation of Nanopore polished reads and assembly of partial prophage contigs
+
+## 5. Analyse of specific genes : identity, phylogeny, recombination
+
+### 5.2. Phylogenies and network analyses
+
+#### Genes forming the *w*Pip *cid* genomic island: phylogenies and network analyses
+
+#### Prophage key genes: phylogenies and network analyses
+
+##### srWO phylogeny
+
+Recombinase sequences used by Bordenstein & Bordenstein (2022) (<https://doi.org/10.1371/journal.pgen.1010227>) were recovered to determine which srWO type were our new wPip prophage sequences. We aligned knwown-srWO type recombinases with wPip Pel-and-JHB recombinases, as well as our Tunis, Slab and Harash prophage recombinases, and included it in a `.faa` file named `srWO_alignment.faa`.
+The best ML substitution model and the phylogenetic tree were then created:
+
+```
+modeltest-ng -i srWO_alignment.faa -p 12 -T raxml -d aa
+
+raxml-ng --all --msa srWO_alignment.faa --model FLU+G4 --prefix srWO_alignment-raxmlng --seed 5 --threads 4 --bs-trees 1000
+
+```
+
+#### wPip phylogeny
+
+We used sequences of five MLST genes from Atyame et al. (2011) (<https://doi.org/10.1093/molbev/msr083>) which we compared to sequences from the wPip Pel-JHB-and-Mol reference genomes, as well as our Harash sequences (the Slab and Tunis sequences were those from Atyame et al.). First, sequences of the pk1, pk2, MutL, GP12, and GP15 genes were independently aligned using `Clustal Omega` (Sievers and Higgins, 2017, <https://doi.org/10.1002/pro.3290>) implemented in `Unipro UGENE` (Okonechnikov et al, 2012, <https://doi.org/10.1093/bioinformatics/bts091>), and concatenated into a .fasta file named `wPip_strain_alignment.fasta`. Next, substitution models were evaluated using `modeltest (v.0.1.7)` (Darriba et al, 2019, <https://doi.org/10.1093/molbev/msz189>) to determine the most appropriate ML substitution model (based on the AICc criterion) for phylogenetic tree construction with `raxml-ng (v.1.1.0)` (Kozlov et al, 2019, <https://doi.org/10.1093/bioinformatics/btz305>):
+
+```
+####bash####
+
+modeltest-ng -i wPip_strain_alignment.fasta -p 12 -T raxml -d nt
+
+raxml-ng --all --msa wPip_strain_alignment.fasta --model HKY+I+G4 --prefix wPip_strain_alignment-raxmlng --seed 5 --threads 4 --bs-trees 1000
+
+```
+
+Finally, the phylogenetic tree was visualized and modified using figtree (<https://github.com/rambaut/figtree/>) and MEGA7 (<https://megasoftware.net/>)
+
+
+## 6. Check-quality of newly assembled prophage contigs by mapping raw Nanopore longreads
+
+#### Step 1. Remove the reads of the host *Culex pipiens* 
 
 Prepare the files usefull for mapping:
 
@@ -54,7 +104,7 @@ Here is a synthesis of the raw sequencing reads' nature of the Harash line as ex
 ```
 
 
-#### Step 2. Select the reads mapped to Wolbachia wPip
+#### Step 2. Select the reads mapped to *Wolbachia* *w*Pip
 
 We mapped the remaining reads longer than 10 kb onto our prophage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d. Here is the example for Harash reads:
 
@@ -106,30 +156,5 @@ samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '{print $1"\t"
 # Mapped on Harashp_c                                    : 475
 # Mapped on Harashp_d                                    : 407
 # Total reads longer than 10kb mapping on Harashp contigs: 1,478
-```
-
-### wPip phylogeny
-
-We used sequences of five MLST genes from Atyame et al. (2011) (<https://doi.org/10.1093/molbev/msr083>) which we compared to sequences from the wPip Pel-JHB-and-Mol reference genomes, as well as our Harash sequences (the Slab and Tunis sequences were those from Atyame et al.). First, sequences of the pk1, pk2, MutL, GP12, and GP15 genes were independently aligned using `Clustal Omega` (Sievers and Higgins, 2017, <https://doi.org/10.1002/pro.3290>) implemented in `Unipro UGENE` (Okonechnikov et al, 2012, <https://doi.org/10.1093/bioinformatics/bts091>), and concatenated into a .fasta file named `wPip_strain_alignment.fasta`. Next, substitution models were evaluated using `modeltest (v.0.1.7)` (Darriba et al, 2019, <https://doi.org/10.1093/molbev/msz189>) to determine the most appropriate ML substitution model (based on the AICc criterion) for phylogenetic tree construction with `raxml-ng (v.1.1.0)` (Kozlov et al, 2019, <https://doi.org/10.1093/bioinformatics/btz305>):
-
-```
-modeltest-ng -i wPip_strain_alignment.fasta -p 12 -T raxml -d nt
-
-raxml-ng --all --msa wPip_strain_alignment.fasta --model HKY+I+G4 --prefix wPip_strain_alignment-raxmlng --seed 5 --threads 4 --bs-trees 1000
-
-```
-
-Finally, the phylogenetic tree was visualized and modified using figtree (<https://github.com/rambaut/figtree/>) and MEGA7 (<https://megasoftware.net/>)
-
-### srWO phylogeny
-
-Recombinase sequences used by Bordenstein & Bordenstein (2022) (<https://doi.org/10.1371/journal.pgen.1010227>) were recovered to determine which srWO type were our new wPip prophage sequences. We aligned knwown-srWO type recombinases with wPip Pel-and-JHB recombinases, as well as our Tunis, Slab and Harash prophage recombinases, and included it in a `.faa` file named ```srWO_alignment.faa```.
-The best ML substitution model and the phylogenetic tree were then created:
-
-```
-modeltest-ng -i srWO_alignment.faa -p 12 -T raxml -d aa
-
-raxml-ng --all --msa srWO_alignment.faa --model FLU+G4 --prefix srWO_alignment-raxmlng --seed 5 --threads 4 --bs-trees 1000
-
 ```
 
