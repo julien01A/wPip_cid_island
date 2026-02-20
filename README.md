@@ -158,3 +158,9 @@ samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '{print $1"\t"
 # Total reads longer than 10kb mapping on Harashp contigs: 1,478
 ```
 
+Global read coverage were vizualised on the respective Harashp contigs using `Integrative Genomics Viewer (v.2.19.7)` (Robinson et al. (2011, <https://doi.org/10.1038/nbt.1754>, <https://igv.org/>) by opening `-sorted.bam` files generated as follow:
+
+```
+####bash####
+anvi-init-bam FBF16085_no_culpip_10kb_on_Harash_quality.bam -o FBF16085_no_culpip_10kb_on_Harash_quality-sorted.bam
+```
