@@ -14,7 +14,7 @@ cat *.fastq.gz > FBF16085_pass_all.fastq.gz
 # importe a reference genome of Wolbachia wPip : Here: NC_010981.1, renamed "wPipPel.fasta"
 ```
 
-To best prepare for mapping the raw sequencing reads onto a clean host Culex pipiens genome, we create a subset of sequences from `ref_culpip.fasta` that are not also found in Wolbachia wPip. Here is the script used to generate the subset dataset `culpip_masked.fa`:
+To best prepare for mapping the raw sequencing reads onto a clean host Culex pipiens genome, we create a subset of sequences from `ref_culpip.fasta` that are not also found in Wolbachia wPip. Here is the script used to generate the subset dataset `culpip_masked.fa` using `bbmap (v.38.87)` (<https://bbmap.org/>):
 
 ```
 ####bash####
