@@ -67,6 +67,8 @@ Here is a synthesis of the raw sequencing reads' nature of the Harash line as ex
 
 ## 2. Selection of Nanopore polished reads by mapping *cif* genes
 
+
+
 ## 3. Identification of *cif* variants in the Nanopore polished reads: *cinA-cinB* monomorphy and *cidA-cidB* variants
 
 `CIDA_FULL_database.fasta` and `CIDB_FULL_database.fasta` deposited in this GitHub repository.
@@ -98,11 +100,6 @@ Finally, the phylogenetic tree was visualized and adapted using `figtree` (<http
 For the wPip phylogeny, we used sequences of five MLST genes (pk1, pk2, MutL, GP12, and GP15) from Atyame et al. (2011) (<https://doi.org/10.1093/molbev/msr083>) which we compared to sequences from the wPip Pel,JHB, and Mol reference genomes, as well as our Harash sequences (the Slab and Tunis sequences were those from Atyame et al.).
 
 For phage gene phylogenies (srWO, Minor capsid, GpA, Tail tape measure, Tail fiber, GpV, RepA and methylase), we compared sequences found on wPip prophages (Pel, JHB, Mol, Tunis, Slab and Tunis) with few key examples of Wolbachia prophages characterized in Bordenstein & Bordenstein (2022) (<https://doi.org/10.1371/journal.pgen.1010227>).
-
-
-
-it in a `.faa` file named `srWO_alignment.faa`.
-The best ML substitution model and the phylogenetic tree were then created:
 
 ### 5.3. Network analyses (recombinations)
 
