@@ -19,10 +19,10 @@ Prepare the files usefull for mapping:
 # Pool all the sequencing .fastq.gz files together
 cat *.fastq.gz > FBF16085_pass_all.fastq.gz
 # importe a reference genome of Culex pipiens. Here: GCA_041146695.1, renamed "ref_culpip.fasta"
-# importe a reference genome of Wolbachia wPip : Here: NC_010981.1, renamed "wPipPel.fasta"
+# importe a reference genome of Wolbachia wPip : Here: AM999887.1, renamed "wPipPel.fasta"
 ```
 
-To best prepare for mapping the raw sequencing reads onto a clean host Culex pipiens genome, we create a subset of sequences from `ref_culpip.fasta` that are not also found in Wolbachia wPip. Here is the script used to generate the subset dataset `culpip_masked.fa` using `bbmap (v.38.87)` (<https://bbmap.org/>):
+To best prepare for mapping the raw sequencing reads onto a clean host *Culex pipiens* genome, we create a subset of sequences from `ref_culpip.fasta` that are not also found in Wolbachia wPip. Here is the script used to generate the subset dataset `culpip_masked.fa` using `bbmap (v.38.87)` (<https://bbmap.org/>):
 
 ```
 ####bash####
@@ -65,23 +65,47 @@ Here is a synthesis of the raw sequencing reads' nature of the Harash line as ex
 
 #### Step 3. XXX
 
+Finir avec un fichier "FBF16085_no_culpip_polished_Illumina.fastq.gz"
+
 ## 2. Selection of Nanopore polished reads by mapping *cif* genes
 
+We used `Minimap2 (v.2.24)` and `samtools (v.1.9)` to map the Nanopore polished reads longer than 10 kb onto *cidA* (*cifA* type I), *cidB* (*cifB* type I), *cinA* (*cifA* type IV) and *cinB* (*cifB* type IV) extracted from the *w*Pip Pel refence genome (accession number: `AM999887.1`), so called: `WP0282`, `WP0283`, `WP0294`, `WP0295` and the ramining cidB fragment `WP1291`. `Minimap2 (v.2.24)` and `samtools (v.1.9)` (<https://github.com/samtools/samtools>) were used. Here is the script for Harash as example:
 
+```
+####bash####
+# Pool the five cif genes *.fasta into a single fasta file, then reformate it for further analyse
+awk 'FNR==1{print ""}1' cidA.fa cidB.fa cinA.fa cinB.fa WP1291.fa > cif_ALL.fasta
 
-## 3. Identification of *cif* variants in the Nanopore polished reads: *cinA-cinB* monomorphy and *cidA-cidB* variants
+# Subselect reads longer than 10kb
+seqkit seq -m 10000 fastq_pass/FBF16085_no_culpip_polished_Illumina.fastq.gz > FBF16085_no_culpip_polished_Illumina_10kb.fastq
 
-`CIDA_FULL_database.fasta` and `CIDB_FULL_database.fasta` deposited in this GitHub repository.
+# Map the subselect reads longer than 10kb with cif genes
+minimap2 -ax map-ont -a cif_ALL.fasta FBF16085_no_culpip_polished_Illumina_10kb.fastq --sam-hit-only > FBF16085_no_culpip_polished_Illumina_10kb_with_cif.sam
+# .sam to .bam
+samtools view -bS FBF16085_no_culpip_polished_Illumina_10kb_with_cif.sam -o FBF16085_no_culpip_polished_Illumina_10kb_with_cif.bam
 
-## 4. Annotation of Nanopore polished reads and assembly of partial prophage contigs
+# Filter the BAM file to keep only reads with mapping quality ≥ 2
+samtools view -bq 2 FBF16085_no_culpip_polished_Illumina_10kb_with_cif.bam > FBF16085_no_culpip_polished_Illumina_10kb_with_cif_quality.bam
 
-## 5. Analyse of specific genes : identity, phylogeny, recombination
+# Extract read IDs mapped to one at least one cif gene from the filtered BAM file. Keep only unique read IDs and save them into a text file
+samtools view -F 4 FBF16085_no_culpip_polished_Illumina_10kb_with_cif_quality.bam | cut -f1 | sort -u > FBF16085_cif_IDs.txt
+seqkit grep -f FBF16085_cif_IDs.txt FBF16085_no_culpip_polished_Illumina_10kb.fastq | seqkit fq2fa > FBF16085_cif_reads.fasta
+```
 
-### 5.1. Identities
+## 3. Annotation of Nanopore polished reads, identification of *cid* variants and assembly of partial prophage contigs
 
-### 5.2. Phylogenies
+The longest Nanopore polished reads containing *cif* genes were annotated using manual BLASTn (megablast program) against the *w*Pip Pel reference genome (accession number: `AM999887.1`). This genome was already annotated with the `NCBI Prokaryotic Genome Annotation Pipeline v6.9`, so the correspondign matches could be attrubuted to predictive genes. A match was considered positive if the nucleotide identity with *w*Pip Pel was above 75%. For genes with undetermined functions in *w*Pip Pel, we renseigne the new predicted functions by Bordenstein and Bordenstein of the corresponding genes (<https://doi.org/10.1371/journal.pgen.1010227>). For transposases, we conducted BLAST searches against `ISfinder` to classify them into homolog groups (Siguier et al. 2006, <https://doi.org/10.1093/nar/gkj014>, <https://isfinder.biotoul.fr/blast.php>) and use `HHpred` (Zimmermann et al. 2018, <https://doi.org/10.1016/j.jmb.2017.12.007>, <https://toolkit.tuebingen.mpg.de/tools/hhpred>) with the `SCOPe70 v.2.08`, `Pfam-A v37.0`, `SMART v6.0`, and `COG/KOG v1.0 databases` to characterized the PDDEXK2 tranposase flanking *cidA* genes. For the group II intron retrotransposons (maturases), we used Zbase for their identification (Candales et al. 2012, <https://doi.org/10.1093/nar/gkr1043>, <http://webapps2.ucalgary.ca/~groupii/cgi-bin/main/blastusr.php>).
 
-All the phylogenetic trees generated in this study were calculated using the `Maximum Likelihood` method. For each gene, operon, or concatenated sequence of interest targeted for phylogenetic analysis, an alignment file was required. All the alignment files were generated by aligning the desired sequences using `Clustal Omega` (Sievers and Higgins (2017),<https://doi.org/10.1002/pro.3290>, <https://github.com/GSLBiotech/clustal-omega>) or `MAFFT` (Katoh and Standley (2013), <https://doi.org/10.1093/molbev/mst010>, <https://github.com/GSLBiotech/mafft>) implemented on `UGENE v52.0` (Okonechnikov et al. (2012), <https://doi.org/10.1093/bioinformatics/bts091>, <https://ugene.net/>), and then the positions with gaps '-' were removed.
+Nanopore polished reads containing *cid* genes were individually screened against databases of *cidA* and *cidB* variants previously identified and extensively characterized in more than 40 *w*Pip strains collected worldwide (Namias et al., 2023, <https://doi.org/10.1016/j.csbj.2023.07.012>, Namias et al., 2025 <https://doi.org/10.1093/molbev/msaf200>). These databases are available in the corresponding GitHub repository under the names `CIDA_FULL_database.fasta` and `CIDB_FULL_database.fasta`. For this analysis, each Nanopore polished read was aligned to the *cid* databases using `MAFFT` implemented on `Geneious` (<https://www.geneious.com/>) and manually curated to precisely identify *cid* variants. 
+For Nanopore polished reads containing *cin* genes, alignments were performed against (*cinA*) and `WP0295.fasta` (*cinB*) to confirm the monomorphy of this gene pair in the *w*Pip strains Tunis, JHB, Slab, Harash, and Mol.
+
+Nanopore polished reads sharing identical *cidA-cidB* variants and exhibiting the same annotated gene composition were aligned together using `MAFFT` (treshold: 99% nucleotide identity) implemented on `UGENE v52.0` (Okonechnikov et al. (2012), <https://doi.org/10.1093/bioinformatics/bts091>, <https://ugene.net/>) to create contigs. The consensus sequences of the final contigs are available on NBCI under accession numbers: `PX571960-PX571970`.
+
+## 4. Phylogenies and network analyses
+
+### 4.1. Phylogenies
+
+All the phylogenetic trees generated in this study were calculated using the `Maximum Likelihood` method. For each gene, operon, or concatenated sequence of interest targeted for phylogenetic analysis, an alignment file was required. All the alignment files were generated by aligning the desired sequences using `Clustal Omega` (Sievers and Higgins (2017),<https://doi.org/10.1002/pro.3290>, <https://github.com/GSLBiotech/clustal-omega>) or `MAFFT` (Katoh and Standley (2013), <https://doi.org/10.1093/molbev/mst010>, <https://github.com/GSLBiotech/mafft>) implemented on `UGENE v52.0`, and then the positions with gaps '-' were removed.
 
 Then, for each ALIGNMENT.fa files, substitution models were evaluated using `modeltest v0.1.7` (Darriba et al. (2019), <https://doi.org/10.1093/molbev/msz189>, <https://github.com/ddarriba/modeltest>) to determine the most appropriate ML substitution model (based on the AICc criterion), followed by phylogenetic tree construction with `raxml-ng v1.1.0` (Kozlov et al. (2019) <https://doi.org/10.1093/bioinformatics/btz305>, <https://github.com/amkozlov/raxml-ng>):
 
@@ -95,19 +119,21 @@ raxml-ng --all --msa ALIGNMENT.fa --model FLU+G4 --prefix Your_Tree-raxmlng --se
 raxml-ng --support --tree Your_Tree-raxmlng.raxml.bestTree --bs-trees 1000 --prefix Your_Tree-boot --threads 2
 ```
 
-Finally, the phylogenetic tree was visualized and adapted using `figtree` (<https://github.com/rambaut/figtree/>) and `MEGA11` (<https://megasoftware.net/>)
+Finally, the phylogenetic tree was visualized and adapted using `figtree v.1.4.4` (<https://github.com/rambaut/figtree/>) and `MEGA11` (<https://megasoftware.net/>)
 
 For the wPip phylogeny, we used sequences of five MLST genes (pk1, pk2, MutL, GP12, and GP15) from Atyame et al. (2011) (<https://doi.org/10.1093/molbev/msr083>) which we compared to sequences from the wPip Pel,JHB, and Mol reference genomes, as well as our Harash sequences (the Slab and Tunis sequences were those from Atyame et al.).
 
 For phage gene phylogenies (srWO, Minor capsid, GpA, Tail tape measure, Tail fiber, GpV, RepA and methylase), we compared sequences found on wPip prophages (Pel, JHB, Mol, Tunis, Slab and Tunis) with few key examples of Wolbachia prophages characterized in Bordenstein & Bordenstein (2022) (<https://doi.org/10.1371/journal.pgen.1010227>).
 
-### 5.3. Network analyses (recombinations)
+### 4.2. Network analyses
 
-## 6. Check-quality of newly assembled prophage contigs by mapping raw Nanopore longreads
+To vizualise recombination events for some specific genes, we used the `SplitsTree App v.4.19.2` (Huson and Bryant (2024), <https://doi.org/10.1038/s41592-024-02406-3>) using the Uncorrected_P distance method and the NeighborNet network method.
 
-### 6.1. Global coverage of the assembled prophage contigs with Nanopore raw reads
+## 5. Check-quality of newly assembled prophage contigs by mapping Nanopore raw reads
 
-To check the quality of our newly assembled prophage contigs, we first mapped the raw Nanopore reads longer than 10 kb onto our prophage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d to visualize the global read coverages. Here is the example for Harash reads:
+### 5.1. Global coverage of the assembled prophage contigs with Nanopore raw reads
+
+To check the quality of our newly assembled prophage contigs, we first mapped the raw Nanopore reads longer than 10 kb onto our prophage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d to visualize the global read coverages. Here is the example for Harash reads with `Minimap2 (v.2.24)` and `samtools (v.1.9)`:
 
 ```
 ####bash####
@@ -166,20 +192,22 @@ Global read coverage were vizualised on the respective Harashp contigs using `In
 anvi-init-bam FBF16085_no_culpip_10kb_on_Harash_quality.bam -o FBF16085_no_culpip_10kb_on_Harash_quality-sorted.bam
 ```
 
-### 6.2. Nanopore raw read analysis of the genomic island forming genes to check for putative Illumina polishing during correction
+### 5.2. Nanopore raw read analysis of genomic island–forming genes to assess potential Illumina polishing artifacts
 
-minimap and seqkit
+`Minimap2 (v.2.24)` was used to retrieve the sequences of three genes (Transposase PDDEXK2, Intron group II and *rnhA*) onto the Nanopore polished reads and the Nanopore raw reads to assess potential Illumina polishing artifacts:
 
 ```
 ####bash####
+# preparation: put in a folder the Nanopore raw reads mapping the prophage contigs created Tunisp*, Slabp* and Harashp* (Harash_reads.fasta, Slab_reads.fasta and Tunis_reads.fasta), the Nanopore polished reads used for contig creation (Harash_polished.fasta, Slab_polished.fasta and Tunis_polished.fasta) and the three target gene queries (querie_TrpPDDEX.fa, querie_intII.fa and querie_rnhA.fa)
+
 for query in querie_*.fa; do
     query_name=$(basename "$query" .fa)
     mkdir -p results_${query_name}
     echo "=== Processing $query ==="
-    for fasta in *_reads.fasta *_reads.fa Slab_*.fa; do
+    for fasta in *.fasta; do
         sample="${fasta%.*}"
         echo "Mapping $query vs $fasta"
-        minimap2 -x asm5 -t 8 "$fasta" "$query" > tmp.paf
+        minimap2 -x map-ont -t 8 "$fasta" "$query" > tmp.paf
         if [ -s tmp.paf ]; then
             awk '{print $6"\t"$8"\t"$9}' tmp.paf > coords.bed
             bedtools getfasta -fi "$fasta" -bed coords.bed -fo results_${query_name}/${sample}_mapped_regions.fasta
@@ -191,3 +219,5 @@ for query in querie_*.fa; do
     done
 done
 ```
+
+Raw read sequences of three target genes (Transposase PDDEXK2, Intron group II and *rnhA*) extracted from Nanopore raw reads and Nanopore polished reads where aligned using `MAFFT`, reverse-complemented if necessary, and visulized on `UGENE`. A synthesis file of theses alignment is available on this GitHub repository, called `Polishing_error_verification.pdf`. Point mutations are detected throughout the reads and in the majority of them. However, none of these mutations are shared between reads; all reads exhibit a common structural pattern, which is more or less clear depending on sequencing quality. These results indicate that only mutations attributable to sequencing errors were identified, demonstrating that Illumina polishing did not introduce artificial artifacts but rather corrected isolated single-nucleotide discrepancies.
