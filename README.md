@@ -61,6 +61,10 @@ Here is a synthesis of the raw sequencing reads' nature of the Harash line as ex
 # Remaining reads                : 342,389
 ```
 
+#### Step 2. XXX
+
+#### Step 3. XXX
+
 ## 2. Selection of Nanopore polished reads by mapping *cif* genes
 
 ## 3. Identification of *cif* variants in the Nanopore polished reads: *cinA-cinB* monomorphy and *cidA-cidB* variants
