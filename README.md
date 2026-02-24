@@ -107,7 +107,7 @@ For phage gene phylogenies (srWO, Minor capsid, GpA, Tail tape measure, Tail fib
 
 ### 6.1. Global coverage of the assembled prophage contigs with Nanopore raw reads
 
-We mapped the remaining reads longer than 10 kb onto our prophage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d. Here is the example for Harash reads:
+To check the quality of our newly assembled prophage contigs, we first mapped the raw Nanopore reads longer than 10 kb onto our prophage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d to visualize the global read coverages. Here is the example for Harash reads:
 
 ```
 ####bash####
