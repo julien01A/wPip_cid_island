@@ -185,13 +185,10 @@ for query in querie_*.fa; do
         minimap2 -x asm5 -t 8 "$fasta" "$query" > tmp.paf
         if [ -s tmp.paf ]; then
             awk '{print $6"\t"$8"\t"$9}' tmp.paf > coords.bed
-            bedtools getfasta \
-                -fi "$fasta" \
-                -bed coords.bed \
-                -fo results_${query_name}/${sample}_mapped_regions.fasta
-            echo "✔ Regions extracted"
+            bedtools getfasta -fi "$fasta" -bed coords.bed -fo results_${query_name}/${sample}_mapped_regions.fasta
+            echo "Regions extracted"
         else
-            echo "✘ No mapping"
+            echo "No mapping"
         fi  
         rm -f tmp.paf coords.bed
     done
