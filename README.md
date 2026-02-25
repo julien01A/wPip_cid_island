@@ -194,7 +194,7 @@ anvi-init-bam FBF16085_no_culpip_10kb_on_Harash_quality.bam -o FBF16085_no_culpi
 
 ### 5.2. Nanopore raw read analysis of genomic island–forming genes to assess potential Illumina polishing artifacts
 
-`Minimap2 (v.2.24)` was used to retrieve the sequences of three genes (Transposase PDDEXK2, Intron group II and *rnhA*) onto the Nanopore polished reads and the Nanopore raw reads to assess potential Illumina polishing artifacts:
+`Minimap2 (v.2.24)` and `Bedtools (v.31.1)` (Quinland (2015), <https://doi.org/10.1002/0471250953.bi1112s47>, <https://github.com/arq5x/bedtools2>) were used to retrieve the sequences of three genes (Transposase PDDEXK2, Intron group II and *rnhA*) onto both the Nanopore polished reads and the Nanopore raw reads to assess potential Illumina polishing artifacts:
 
 ```
 ####bash####
