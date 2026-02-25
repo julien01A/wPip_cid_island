@@ -198,19 +198,19 @@ anvi-init-bam FBF16085_no_culpip_10kb_on_Harash_quality.bam -o FBF16085_no_culpi
 
 ```
 ####bash####
-# preparation: put in a folder the Nanopore raw reads mapping the prophage contigs created Tunisp*, Slabp* and Harashp* (Harash_reads.fasta, Slab_reads.fasta and Tunis_reads.fasta), the Nanopore polished reads used for contig creation (Harash_polished.fasta, Slab_polished.fasta and Tunis_polished.fasta) and the three target gene queries (querie_TrpPDDEX.fa, querie_intII.fa and querie_rnhA.fa)
+# preparation: put in a folder the Nanopore raw reads which map the prophage contigs Tunisp*, Slabp* and Harashp* (these raw reads were called Harash_reads.fasta, Slab_reads.fasta and Tunis_reads.fasta), the Nanopore polished reads used to create the contigs (Harash_polished.fasta, Slab_polished.fasta and Tunis_polished.fasta) and the three target gene queries (querie_TrpPDDEX.fa, querie_intII.fa and querie_rnhA.fa)
 
 for query in querie_*.fa; do
     query_name=$(basename "$query" .fa)
-    mkdir -p results_${query_name}
+    mkdir -p results_2_${query_name}
     echo "=== Processing $query ==="
     for fasta in *.fasta; do
         sample="${fasta%.*}"
-        echo "Mapping $query vs $fasta"
-        minimap2 -x map-ont -t 8 "$fasta" "$query" > tmp.paf
+        echo "Mapping $fasta vs $query"
+        minimap2 -x map-ont -k13 -w5 -A1 -B2 -O2,24 -E2,1 -t 8 "$query" "$fasta" > tmp.paf
         if [ -s tmp.paf ]; then
-            awk '{print $6"\t"$8"\t"$9}' tmp.paf > coords.bed
-            bedtools getfasta -fi "$fasta" -bed coords.bed -fo results_${query_name}/${sample}_mapped_regions.fasta
+            awk '$11 > 300 {print $1"\t"$3"\t"$4}' tmp.paf > coords.bed
+            bedtools getfasta -fi "$fasta" -bed coords.bed -fo results_2_${query_name}/${sample}_mapped_regions.fasta
             echo "Regions extracted"
         else
             echo "No mapping"
