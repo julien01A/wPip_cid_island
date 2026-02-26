@@ -129,6 +129,26 @@ For phage gene phylogenies (srWO, Minor capsid, GpA, Tail tape measure, Tail fib
 
 To vizualise recombination events for some specific genes, we used the `SplitsTree App v.4.19.2` (Huson and Bryant (2024), <https://doi.org/10.1038/s41592-024-02406-3>) using the Uncorrected_P distance method and the NeighborNet network method.
 
+# 4.3. Identities
+
+To estimate similarity percentages for selected target genes (for instance, comparing structural prophage genes with genes from the *cid* genomic island), each gene was aligned independently using MAFFT implemented on UGENE. By comparing the sequences from our wPip prophage contigs and those of the reference genomes Pel and JHB, we then calculated the percentage of similarity as the number of variable positions over the total number of aligned positions fo each gene:
+
+```
+####R####
+library(ape)
+alignment <- read.dna("Terminase_AL.fa", format = "fasta") # where Terminase_Al.fa is an alignement file of the target gene
+aln_matrix <- as.matrix(alignment)
+is_polymorphic <- function(column) {
+  length(unique(column)) > 1
+}
+polymorphic_sites <- apply(aln_matrix, 2, is_polymorphic)
+n_poly <- sum(polymorphic_sites)
+alignment_length <- ncol(aln_matrix)
+percent_poly <- (n_poly / alignment_length) * 100
+cat("Total sites:", alignment_length, "\n")
+cat("Polymorphic sites:", n_poly, "\n")
+```
+
 ## 5. Check-quality of newly assembled prophage contigs by mapping Nanopore raw reads
 
 ### 5.1. Global coverage of the assembled prophage contigs with Nanopore raw reads
