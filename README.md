@@ -101,7 +101,7 @@ For Nanopore polished reads containing *cin* genes, alignments were performed ag
 
 Nanopore polished reads sharing identical *cidA-cidB* variants and exhibiting the same annotated gene composition were aligned together using `MAFFT` (treshold: 99% nucleotide identity) implemented on `UGENE v52.0` (Okonechnikov et al. (2012), <https://doi.org/10.1093/bioinformatics/bts091>, <https://ugene.net/>) to create contigs. The consensus sequences of the final contigs are available on NBCI under accession numbers: `PX571960-PX571970`.
 
-## 4. Phylogenies and network analyses
+## 4. Phylogenies, networks and whole identities of target genes
 
 ### 4.1. Phylogenies
 
@@ -129,7 +129,7 @@ For phage gene phylogenies (srWO, Minor capsid, GpA, Tail tape measure, Tail fib
 
 To vizualise recombination events for some specific genes, we used the `SplitsTree App v.4.19.2` (Huson and Bryant (2024), <https://doi.org/10.1038/s41592-024-02406-3>) using the Uncorrected_P distance method and the NeighborNet network method.
 
-# 4.3. Identities
+### 4.3. Identities
 
 To estimate similarity percentages for selected target genes (for instance, comparing structural prophage genes with genes from the *cid* genomic island), each gene was aligned independently using MAFFT implemented on UGENE. By comparing the sequences from our wPip prophage contigs and those of the reference genomes Pel and JHB, we then calculated the percentage of similarity as the number of variable positions over the total number of aligned positions fo each gene:
 
