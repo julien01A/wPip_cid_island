@@ -221,7 +221,7 @@ anvi-init-bam FBF16085_no_culpip_10kb_on_Harash_quality.bam -o FBF16085_no_culpi
 
 ```
 ####bash####
-# preparation: put in a folder the Nanopore raw reads which map the prophage contigs Tunisp*, Slabp* and Harashp* (these raw reads were called Harash_reads.fasta, Slab_reads.fasta and Tunis_reads.fasta), the Nanopore polished reads used to create the contigs (Harash_polished.fasta, Slab_polished.fasta and Tunis_polished.fasta) and the three target gene queries (querie_TrpPDDEX.fa, querie_intII.fa and querie_rnhA.fa)
+# preparation: put in a folder the Nanopore raw reads which map the prophage contigs Tunisp* and Harashp* (these raw reads were called Harash_reads.fasta and Tunis_reads.fasta), the Nanopore polished reads used to create the contigs (Harash_polished.fasta and Tunis_polished.fasta) and the three target gene queries (querie_TrpPDDEX.fa, querie_intII.fa and querie_rnhA.fa)
 
 for query in querie_*.fa; do
     query_name=$(basename "$query" .fa)
