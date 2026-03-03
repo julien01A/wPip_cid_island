@@ -61,11 +61,13 @@ Here is a synthesis of the raw sequencing reads' nature of the Harash line as ex
 # Remaining reads                : 342,389
 ```
 
-#### Step 2. XXX
-
-#### Step 3. XXX
+#### Step 2. Polishing with Illumina short reads
 
 Finir avec un fichier "FBF16085_no_culpip_polished_Illumina.fastq.gz"
+
+#### Step 3. Assembly attempts
+
+
 
 ## 2. Selection of Nanopore polished reads by mapping *cif* genes
 
