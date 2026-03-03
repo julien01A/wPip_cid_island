@@ -6,7 +6,7 @@ The study aimed to characterize the genomic context and identify key genes flank
 
 This GitHub repository provides the main commands, scripts, and key intermediate files used throughout the analyses.
 
-## 1. *De novo* assembly
+## 1. Polishing and *De novo* assembly
 
 Here is an example of the workflow used for Harash.
 
