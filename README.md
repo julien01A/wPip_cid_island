@@ -171,8 +171,8 @@ For phage gene phylogenies (srWO, Minor capsid, GpA, Tail tape measure, Tail fib
 
 ### 4.3. Network analyses
 
-To vizualise recombination events for some specific genes, we used the `SplitsTree App v.4.19.2` (Huson and Bryant (2024), <https://doi.org/10.1038/s41592-024-02406-3>) using the Uncorrected_P distance method and the NeighborNet network method.
-For each alignement, a formal test of recombination (PHI test) were performed using SplitsTree.
+To vizualise recombination events for some specific genes, we used the `SplitsTree App v.4.19.2` (Huson and Bryant (2024), <https://doi.org/10.1038/s41592-024-02406-3>) using the `Uncorrected_P distance` method and the `NeighborNet network` method.
+For each alignement, a formal test of recombination `PHI test` were performed using SplitsTree.
 
 ## 5. Check-quality of newly assembled prophage contigs by mapping Nanopore raw reads
 
