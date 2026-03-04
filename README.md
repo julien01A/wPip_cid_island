@@ -77,7 +77,7 @@ minimap2 -ax sr -t 8 FBF16085_no_culpip.fastq Harash-R1.fastq.gz Harash-R2.fastq
 samtools index FBF16085_no_culpip_with_Illumina.bam
 ```
 
-We then used `Racon v1.4.20` (Vaser et al. (2017), <https://doi.org/10.1101/gr.214270.116>, <https://github.com/lbcb-sci/racon>) for the pollishing:
+We then used `Racon v1.4.20` (Vaser et al. (2017), <https://doi.org/10.1101/gr.214270.116>, <https://github.com/lbcb-sci/racon>) for the polishing:
 
 ```
 ####bash####
