@@ -6,7 +6,7 @@ The study aimed to characterize the genomic context and identify key genes flank
 
 This GitHub repository provides the main commands, scripts, and key intermediate files used throughout the analyses.
 
-## 1. Polishing and *de novo* assembly
+## 1. *De novo* assembly attempts and polishing
 
 Here is an example of the workflow used for Harash.
 
@@ -61,17 +61,39 @@ Here is a synthesis of the raw sequencing reads' nature of the Harash line as ex
 # Remaining reads                : 342,389
 ```
 
-#### Step 2. Polishing with Illumina short reads
+#### Step 2. Assembly attempts
 
-Finir avec un fichier "FBF16085_no_culpip_polished_Illumina.fastq.gz"
+Ici Pilon !
 
-#### Step 3. Assembly attempts
+#### Step 3. Given the inability to assemble, we retrieved the Nanopore sequences polished with Illumina reads.
 
+Given the inability to assemble, we therefore adopted a new strategy, focusing on the detailed analysis of the raw reads of interest, as described in the study. To this end, the Nanopore long reads were first polished with Illumina data to enhance sequence quality for downstream analyses. Here is the workflow used for Harash as example. 
 
+First, Illumina reads were mapped on Nanopore reads using `Minimap2 (v.2.24)` and `samtools (v.1.9)`:
+
+```
+####bash####
+minimap2 -ax sr -t 8 FBF16085_no_culpip.fastq Harash-R1.fastq.gz Harash-R2.fastq.gz | samtools sort -@ 1 -O BAM -o FBF16085_no_culpip_with_Illumina.bam
+samtools index FBF16085_no_culpip_with_Illumina.bam
+```
+
+We then used `Racon v1.4.20` (Vaser et al. (2017), <https://doi.org/10.1101/gr.214270.116>, <https://github.com/lbcb-sci/racon>) for the pollishing:
+
+```
+####bash####
+racon -t 8 Harash-R1.fastq.gz FBF16085_no_culpip_with_Illumina.bam FBF16085_no_culpip.fastq > FBF16085_no_culpip_polished_Illumina.fastq
+```
+
+Note that for Slab, we used `Ratatosk v0.9.0` (Holley et al. (2021), <https://doi.org/10.1186/s13059-020-02244-4>, <https://github.com/DecodeGenetics/Ratatosk/tree/master>):
+
+```
+####bash####
+ratatosk correct -l SRRSlab_no_culpip.fastq -s Slab-R1.fastq.gz Slab-R2.fastq.gz -t 8 -o SRRSlab_no_culpip_polished_Illumina.fastq
+```
 
 ## 2. Selection of Nanopore polished reads by mapping *cif* genes
 
-We used `Minimap2 (v.2.24)` and `samtools (v.1.9)` to map the Nanopore polished reads longer than 10 kb onto *cidA* (*cifA* type I), *cidB* (*cifB* type I), *cinA* (*cifA* type IV) and *cinB* (*cifB* type IV) extracted from the *w*Pip Pel refence genome (accession number: `AM999887.1`), so called: `WP0282`, `WP0283`, `WP0294`, `WP0295` and the ramining cidB fragment `WP1291`. `Minimap2 (v.2.24)` and `samtools (v.1.9)` (<https://github.com/samtools/samtools>) were used. Here is the script for Harash as example:
+We used `Minimap2 (v.2.24)` and `samtools (v.1.9)` to map the Nanopore polished reads longer than 10 kb onto *cidA* (*cifA* type I), *cidB* (*cifB* type I), *cinA* (*cifA* type IV) and *cinB* (*cifB* type IV) extracted from the *w*Pip Pel refence genome (accession number: `AM999887.1`), so called: `WP0282`, `WP0283`, `WP0294`, `WP0295` and the ramining *cidB* fragment `WP1291`. `Minimap2 (v.2.24)` and `samtools (v.1.9)` were used. Here is the script for Harash as example:
 
 ```
 ####bash####
@@ -79,7 +101,7 @@ We used `Minimap2 (v.2.24)` and `samtools (v.1.9)` to map the Nanopore polished 
 awk 'FNR==1{print ""}1' cidA.fa cidB.fa cinA.fa cinB.fa WP1291.fa > cif_ALL.fasta
 
 # Subselect reads longer than 10kb
-seqkit seq -m 10000 fastq_pass/FBF16085_no_culpip_polished_Illumina.fastq.gz > FBF16085_no_culpip_polished_Illumina_10kb.fastq
+seqkit seq -m 10000 fastq_pass/FBF16085_no_culpip_polished_Illumina.fastq > FBF16085_no_culpip_polished_Illumina_10kb.fastq
 
 # Map the subselect reads longer than 10kb with cif genes
 minimap2 -ax map-ont -a cif_ALL.fasta FBF16085_no_culpip_polished_Illumina_10kb.fastq --sam-hit-only > FBF16085_no_culpip_polished_Illumina_10kb_with_cif.sam
