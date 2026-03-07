@@ -94,7 +94,7 @@ unicycler -l FBF16085_no_culpip.fastq -o Harash_Nanopore-Unicycler_test1 -t 32 -
 unicycler -1 CPip_Harash_1.fq.gz -2 CPip_Harash_2.fq.gz -l FBF16085_no_culpip.fastq -o Harash_Unicycler_hybrid -t 32
 ```
 
-Assembly results were then visualized using `Bandage v0.8.1` (<https://rrwick.github.io/Bandage/>). 
+Assembly results were then visualized using `Bandage v0.8.1` (<https://rrwick.github.io/Bandage/>). None of the assembly attempts yielded a circular genome.
 
 #### Step 3. Given the inability to assemble, we retrieved the Nanopore sequences polished with Illumina reads.
 
