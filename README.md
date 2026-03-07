@@ -63,7 +63,34 @@ Here is a synthesis of the raw sequencing reads' nature of the Harash line as ex
 
 #### Step 2. Assembly attempts
 
-Ici Pilon !
+We first try a *de novo* assembly using Nanopore long reads only with `Flye v2.9.2` (Kolmogorov et al, 2019, <https://doi.org/10.1038/s41587-019-0072-8>, <https://github.com/mikolmogorov/Flye>):
+
+```
+####bash####
+flye --nano-raw FBF16085_no_culpip.fastq --out-dir ./Harash_Nanopore-Flye_test1 --threads 32 --iterations 5 --meta --debug
+flye --nano-raw FBF16085_no_culpip.fastq.gz --out-dir ./Harash_Nanopore-Flye_test2 --threads 32 --iterations 5 --meta --debug --genome-size 1600000
+```
+
+We then add Illumina reads using `samtools (v.1.9)` and `pilon v1.23` (Walker et al, 2014, <https://doi.org/10.1371/journal.pone.0112963>, <https://github.com/broadinstitute/pilon>):
+
+```
+####bash####
+bwa index assembly.fasta
+bwa mem -t 32 assembly.fasta illumina_R1.fastq.gz illumina_R2.fastq.gz | samtools sort -@ 32 -o illumina.bam
+samtools index illumina.bam
+
+pilon --genome assembly.fasta --frags illumina.bam --output wolbachia_pilon --threads 32
+```
+
+We also try `unicycler vXXX` (Wick et al, 2017, <https://doi.org/10.1371/journal.pcbi.1005595>, <https://github.com/rrwick/Unicycler>):
+
+```
+####bash####
+unicycler -l FBF16085_no_culpip.fastq -o Harash_Nanopore-Unicycler_test1 -t 32 --mode bold
+unicycler -1 illumina_R1.fastq.gz -2 illumina_R2.fastq.gz -l FBF16085_no_culpip.fastq -o Harash_Unicycler_hybrid -t 32
+```
+
+Assembly results were then visualized using `Bandage v0.8.1` (<https://rrwick.github.io/Bandage/>).
 
 #### Step 3. Given the inability to assemble, we retrieved the Nanopore sequences polished with Illumina reads.
 
