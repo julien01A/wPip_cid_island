@@ -71,30 +71,34 @@ flye --nano-raw FBF16085_no_culpip.fastq --out-dir ./Harash_Nanopore-Flye_test1 
 flye --nano-raw FBF16085_no_culpip.fastq.gz --out-dir ./Harash_Nanopore-Flye_test2 --threads 32 --iterations 5 --meta --debug --genome-size 1600000
 ```
 
-We then add Illumina reads using `samtools (v.1.9)` and `pilon v1.23` (Walker et al, 2014, <https://doi.org/10.1371/journal.pone.0112963>, <https://github.com/broadinstitute/pilon>):
+We then add Illumina reads using `samtools (v.1.9)` and `pilon v1.23` (Walker et al, 2014, <https://doi.org/10.1371/journal.pone.0112963>, <https://github.com/broadinstitute/pilon>). Host Culex reads from Illumina sequencing were removed prior to processing, as described above:
 
 ```
 ####bash####
-bwa index assembly.fasta
-bwa mem -t 32 assembly.fasta illumina_R1.fastq.gz illumina_R2.fastq.gz | samtools sort -@ 32 -o illumina.bam
+bwa index Harash_Nanopore_flye_assembly.fasta
+bwa mem -t 32 Harash_Nanopore_flye_assembly.fasta CPip_Harash_1.fq.gz CPip_Harash_2.fq.gz | samtools sort -@ 32 -o Harash_illumina.bam
 samtools index illumina.bam
 
-pilon --genome assembly.fasta --frags illumina.bam --output wolbachia_pilon --threads 32
+pilon --genome Harash_flye_assembly.fasta --frags Harash_illumina.bam --output Harash_pilon --threads 32
 ```
 
-We also try `unicycler vXXX` (Wick et al, 2017, <https://doi.org/10.1371/journal.pcbi.1005595>, <https://github.com/rrwick/Unicycler>):
+We also try `unicycler v.0.4.4` (Wick et al, 2017, <https://doi.org/10.1371/journal.pcbi.1005595>, <https://github.com/rrwick/Unicycler>):
 
 ```
 ####bash####
+
+# with Nanopore longreads only
 unicycler -l FBF16085_no_culpip.fastq -o Harash_Nanopore-Unicycler_test1 -t 32 --mode bold
-unicycler -1 illumina_R1.fastq.gz -2 illumina_R2.fastq.gz -l FBF16085_no_culpip.fastq -o Harash_Unicycler_hybrid -t 32
+
+# with Nanopore and Illumina reads
+unicycler -1 CPip_Harash_1.fq.gz -2 CPip_Harash_2.fq.gz -l FBF16085_no_culpip.fastq -o Harash_Unicycler_hybrid -t 32
 ```
 
-Assembly results were then visualized using `Bandage v0.8.1` (<https://rrwick.github.io/Bandage/>).
+Assembly results were then visualized using `Bandage v0.8.1` (<https://rrwick.github.io/Bandage/>). 
 
 #### Step 3. Given the inability to assemble, we retrieved the Nanopore sequences polished with Illumina reads.
 
-Given the inability to assemble, we therefore adopted a new strategy, focusing on the detailed analysis of the raw reads of interest, as described in the study. To this end, the Nanopore long reads were first polished with Illumina data to enhance sequence quality for downstream analyses. Here is the workflow used for Harash as example. 
+Given the inability to fully assemble (circularize), we therefore adopted a new strategy, focusing on the detailed analysis of the raw reads of interest, as described in the study. To this end, the Nanopore long reads were first polished with Illumina data to enhance sequence quality for downstream analyses. Here is the workflow used for Harash as example. 
 
 First, Illumina reads were mapped on Nanopore reads using `Minimap2 (v.2.24)` and `samtools (v.1.9)`:
 
