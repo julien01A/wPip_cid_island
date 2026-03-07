@@ -22,7 +22,7 @@ cat *.fastq.gz > FBF16085_pass_all.fastq.gz
 # importe a reference genome of Wolbachia wPip : Here: AM999887.1, renamed "wPipPel.fasta"
 ```
 
-To best prepare for mapping the raw sequencing reads onto a clean host *Culex pipiens* genome, we create a subset of sequences from `ref_culpip.fasta` that are not also found in Wolbachia wPip. Here is the script used to generate the subset dataset `culpip_masked.fa` using `bbmap (v.38.87)` (<https://bbmap.org/>):
+To best prepare for mapping the raw sequencing reads onto a clean host *Culex pipiens* genome, we create a subset of sequences from `ref_culpip.fasta` that are not also found in Wolbachia *w*Pip. Here is the script used to generate the subset dataset `culpip_masked.fa` using `bbmap (v.38.87)` (<https://bbmap.org/>):
 
 ```
 ####bash####
@@ -76,7 +76,7 @@ We then add Illumina reads using `samtools (v.1.9)` and `pilon v1.23` (Walker et
 ```
 ####bash####
 bwa index Harash_Nanopore_flye_assembly.fasta
-bwa mem -t 32 Harash_Nanopore_flye_assembly.fasta CPip_Harash_1.fq.gz CPip_Harash_2.fq.gz | samtools sort -@ 32 -o Harash_illumina.bam
+bwa mem -t 32 Harash_Nanopore_flye_assembly.fasta CPip_Harash_1_no_culpip.fq.gz CPip_Harash_2_no_culpip.fq.gz | samtools sort -@ 32 -o Harash_illumina.bam
 samtools index illumina.bam
 
 pilon --genome Harash_flye_assembly.fasta --frags Harash_illumina.bam --output Harash_pilon --threads 32
@@ -91,7 +91,7 @@ We also try `unicycler v.0.4.4` (Wick et al, 2017, <https://doi.org/10.1371/jour
 unicycler -l FBF16085_no_culpip.fastq -o Harash_Nanopore-Unicycler_test1 -t 32 --mode bold
 
 # with Nanopore and Illumina reads
-unicycler -1 CPip_Harash_1.fq.gz -2 CPip_Harash_2.fq.gz -l FBF16085_no_culpip.fastq -o Harash_Unicycler_hybrid -t 32
+unicycler -1 CPip_Harash_1_no_culpip.fq.gz -2 CPip_Harash_2_no_culpip.fq.gz -l FBF16085_no_culpip.fastq -o Harash_Unicycler_hybrid -t 32
 ```
 
 Assembly results were then visualized using `Bandage v0.8.1` (<https://rrwick.github.io/Bandage/>). None of the assembly attempts yielded a circular genome.
