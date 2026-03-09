@@ -77,7 +77,7 @@ We then add Illumina reads using `samtools (v.1.9)` and `pilon v1.23` (Walker et
 ####bash####
 bwa index Harash_Nanopore_flye_assembly.fasta
 bwa mem -t 32 Harash_Nanopore_flye_assembly.fasta CPip_Harash_1_no_culpip.fq.gz CPip_Harash_2_no_culpip.fq.gz | samtools sort -@ 32 -o Harash_illumina.bam
-samtools index illumina.bam
+samtools index Harash_illumina.bam
 
 pilon --genome Harash_flye_assembly.fasta --frags Harash_illumina.bam --output Harash_pilon --threads 32
 ```
@@ -108,18 +108,11 @@ minimap2 -ax sr -t 8 FBF16085_no_culpip.fastq Harash-R1.fastq.gz Harash-R2.fastq
 samtools index FBF16085_no_culpip_with_Illumina.bam
 ```
 
-We then used `Racon v1.4.20` (Vaser et al. (2017), <https://doi.org/10.1101/gr.214270.116>, <https://github.com/lbcb-sci/racon>) for the polishing:
+We then used `Ratatosk v0.9.0` (Holley et al. (2021), <https://doi.org/10.1186/s13059-020-02244-4>, <https://github.com/DecodeGenetics/Ratatosk/tree/master>) for the polishing:
 
 ```
 ####bash####
-racon -t 8 Harash-R1.fastq.gz FBF16085_no_culpip_with_Illumina.bam FBF16085_no_culpip.fastq > FBF16085_no_culpip_polished_Illumina.fastq
-```
-
-Note that for Slab, we used `Ratatosk v0.9.0` (Holley et al. (2021), <https://doi.org/10.1186/s13059-020-02244-4>, <https://github.com/DecodeGenetics/Ratatosk/tree/master>):
-
-```
-####bash####
-ratatosk correct -l SRRSlab_no_culpip.fastq -s Slab-R1.fastq.gz Slab-R2.fastq.gz -t 8 -o SRRSlab_no_culpip_polished_Illumina.fastq
+ratatosk correct -l FBF16085_no_culpip.fastq -s CPip_Harash_1_no_culpip.fq.gz CPip_Harash_2_no_culpip.fq.gz -t 8 -o FBF16085_no_culpip_polished_Illumina.fastq
 ```
 
 ## 2. Selection of Nanopore polished reads by mapping *cif* genes
