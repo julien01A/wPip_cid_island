@@ -102,7 +102,7 @@ Given the inability to fully assemble (circularize), we therefore adopted a new 
 
 ```
 ####bash####
-ratatosk correct -l FBF16085_no_culpip.fastq -s CPip_Harash_1_no_culpip.fastq.gz,CPip_Harash_2_no_culpip.fastq.gz -t 20 -o FBF16085_no_culpip_polished_Illumina.fastq```
+ratatosk correct -l FBF16085_no_culpip.fastq -s CPip_Harash_1_no_culpip.fastq.gz,CPip_Harash_2_no_culpip.fastq.gz -t 20 -o FBF16085_no_culpip_polished_Illumina.fastq
 ```
 
 ## 2. Selection of Nanopore polished reads by mapping *cif* genes
