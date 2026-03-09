@@ -98,22 +98,11 @@ Assembly results were then visualized using `Bandage v0.8.1` (<https://rrwick.gi
 
 #### Step 3. Given the inability to assemble, we retrieved the Nanopore sequences polished with Illumina reads.
 
-Given the inability to fully assemble (circularize), we therefore adopted a new strategy, focusing on the detailed analysis of the raw reads of interest, as described in the study. To this end, the Nanopore long reads were first polished with Illumina data to enhance sequence quality for downstream analyses. Here is the workflow used for Harash as example. 
-
-First, Illumina reads were mapped on Nanopore reads using `Minimap2 (v.2.24)` and `samtools (v.1.9)`:
+Given the inability to fully assemble (circularize), we therefore adopted a new strategy, focusing on the detailed analysis of the raw reads of interest, as described in the study. To this end, the Nanopore long reads were first polished with Illumina data to enhance sequence quality for downstream analyses. Here is the command used for Harash as example. We used `Ratatosk v0.9.0` (Holley et al. (2021), <https://doi.org/10.1186/s13059-020-02244-4>, <https://github.com/DecodeGenetics/Ratatosk/tree/master>) for the polishing:
 
 ```
 ####bash####
-minimap2 -ax sr -t 8 FBF16085_no_culpip.fastq Harash-R1.fastq.gz Harash-R2.fastq.gz | samtools sort -@ 1 -O BAM -o FBF16085_no_culpip_with_Illumina.bam
-samtools index FBF16085_no_culpip_with_Illumina.bam
-```
-
-We then used `Ratatosk v0.9.0` (Holley et al. (2021), <https://doi.org/10.1186/s13059-020-02244-4>, <https://github.com/DecodeGenetics/Ratatosk/tree/master>) for the polishing:
-
-```
-####bash####
-ratatosk correct -l FBF16085_no_culpip.fastq -s CPip_Harash_1_no_culpip.fq.gz CPip_Harash_2_no_culpip.fq.gz -t 8 -o FBF16085_no_culpip_polished_Illumina.fastq
-```
+ratatosk correct -l FBF16085_no_culpip.fastq -s CPip_Harash_1_no_culpip.fastq.gz,CPip_Harash_2_no_culpip.fastq.gz -t 20 -o FBF16085_no_culpip_polished_Illumina.fastq```
 
 ## 2. Selection of Nanopore polished reads by mapping *cif* genes
 
