@@ -190,9 +190,9 @@ For each alignement, a formal test of recombination `PHI test` were performed us
 
 ## 5. Check-quality of newly assembled prophage contigs by mapping Nanopore raw reads
 
-### 5.1. Global coverage of the assembled prophage contigs with Nanopore raw reads
+### 5.1. Global coverage of the assembled prophage contigs with Nanopore and Illumina raw reads
 
-To check the quality of our newly assembled prophage contigs, we first mapped the raw Nanopore reads longer than 10 kb onto our prophage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d to visualize the global read coverages. Here is the example for Harash reads with `Minimap2 (v.2.24)` and `samtools (v.1.9)`:
+To check the quality of our newly assembled prophage contigs, we first mapped the raw Nanopore and Illumina reads onto our prophage contigs Tunisp-a–d, Slabp-a–c, and Harashp-a–d to visualize the global read coverages. Here is the example for Harash reads with `Minimap2 (v.2.24)` and `samtools (v.1.9)`:
 
 ```
 ####bash####
@@ -202,53 +202,109 @@ awk '/^>/ {print; next} {gsub(/[RYSWKMBDHV-]/,"N"); print}' Harashp_ALL.fasta > 
 awk '/^>/{skip=seen[$0]++} !skip' Harashp_ALL_1.fasta > Harashp_ALL.fasta
 rm Harashp_ALL_1.fasta
 
-# Subselect reads longer than 10kb
-seqkit seq -m 10000 fastq_pass/FBF16085_no_culpip.fastq.gz > FBF16085_no_culpip_10kb.fastq
-
-# Map the subselect reads longer than 10kb to the Harashp_* contigs
-minimap2 -ax map-ont -a Harashp_ALL.fasta FBF16085_no_culpip_10kb.fastq --sam-hit-only > FBF16085_no_culpip_10kb_on_Harashp.sam
+#### For Nanopore ####
+# Map the reads to the Harashp_* contigs
+minimap2 -ax map-ont -a Harashp_ALL.fasta Harash_wPip.fastq.gz --sam-hit-only > Harash_wPip_on_Harashp.sam
 # .sam to .bam
-samtools view -bS FBF16085_no_culpip_10kb_on_Harashp.sam -o FBF16085_no_culpip_10kb_on_Harash-raw.bam
+samtools view -bS Harash_wPip_on_Harashp.sam -o Harash_wPip_on_Harashp-raw.bam
 
-# Filter the BAM file to keep only reads with mapping quality ≥ 2
-samtools view -bq 2 FBF16085_no_culpip_10kb_on_Harash-raw.bam > FBF16085_no_culpip_10kb_on_Harash_quality.bam
+# create .bai for IGV visualization
+samtools sort -@ 8 -o Harash_wPip_on_Harashp-raw.sorted.bam Harash_wPip_on_Harashp-raw.bam
+samtools index Harash_wPip_on_Harashp-raw.sorted.bam
 
-# Extract read IDs mapped to reference "Harashp_*" from the filtered BAM file. Keep only unique read IDs and save them into a text file
-samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '$3=="Harashp_a" {print $1}' | sort -u > Harashp_a_IDs.txt
-seqkit grep -f Harashp_a_IDs.txt FBF16085_no_culpip_10kb.fastq | seqkit fq2fa > Harashp_a_reads.fasta
-grep -o ">" Harashp_a_reads.fasta | wc -l
+samtools coverage Harash_wPip_on_Harashp-raw.sorted.bam > Harashp.tsv
 
-samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '$3=="Harashp_b" {print $1}' | sort -u > Harashp_b_IDs.txt
-seqkit grep -f Harashp_b_IDs.txt FBF16085_no_culpip_10kb.fastq | seqkit fq2fa > Harashp_b_reads.fasta
-grep -o ">" Harashp_b_reads.fasta | wc -l
 
-samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '$3=="Harashp_c" {print $1}' | sort -u > Harashp_c_IDs.txt
-seqkit grep -f Harashp_c_IDs.txt FBF16085_no_culpip_10kb.fastq | seqkit fq2fa > Harashp_c_reads.fasta
-grep -o ">" Harashp_c_reads.fasta | wc -l
+#### For Illumina ####
 
-samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '$3=="Harashp_d" {print $1}' | sort -u > Harashp_d_IDs.txt
-seqkit grep -f Harashp_d_IDs.txt FBF16085_no_culpip_10kb.fastq | seqkit fq2fa > Harashp_d_reads.fasta
-grep -o ">" Harashp_d_reads.fasta | wc -l
-```
+bwa index harash_contigs/Harashp_ALL.fasta
 
-Here are the commands and synthesis of the remaining reads longer than 10 kb matching with the Harashp contigs:
+bwa mem -t 16 harash_contigs/Harashp_ALL.fasta \
+harash_contigs/Harash_Illumina_R1.fastq.gz \
+harash_contigs/Harash_Illumina_R2.fastq.gz > harash_contigs/Harash.sam
 
-```
-####bash####
-samtools view FBF16085_no_culpip_10kb_on_Harash_quality.bam | awk '{print $1"\t"$3}' | sort -u | cut -f2 | sort | uniq -c
+samtools view -bS harash_contigs/Harash.sam | \
+samtools sort -@ 8 -o harash_contigs/Harash.sorted.bam
 
-# Mapped on Harashp_a                                    : 504
-# Mapped on Harashp_b                                    : 92
-# Mapped on Harashp_c                                    : 475
-# Mapped on Harashp_d                                    : 407
-# Total reads longer than 10kb mapping on Harashp contigs: 1,478
-```
+samtools index harash_contigs/Harash.sorted.bam
 
-Global read coverage were vizualised on the respective Harashp contigs using `Integrative Genomics Viewer (v.2.19.7)` (Robinson et al. (2011, <https://doi.org/10.1038/nbt.1754>, <https://igv.org/>) by opening `-sorted.bam` files generated as follow:
+# To obtain the mean coverage of each contig
+samtools coverage harash_contigs/Harash.sorted.bam > harash_contigs/Harash_coverage.tsv
+
+# For next steps (vizualisation)
+samtools depth -a Harash.sorted.bam > Harash_depth.txt
 
 ```
-####bash####
-anvi-init-bam FBF16085_no_culpip_10kb_on_Harash_quality.bam -o FBF16085_no_culpip_10kb_on_Harash_quality-sorted.bam
+
+Global read coverage of each contigs were vizualised using the `depth.txt` files run in an in-house R script :
+
+```
+####R####
+files <- c(
+  "HarashIllumina_depth.txt",
+  "HarashONT_depth.txt",
+  "SlabIllumina_depth.txt",
+  "SlabONT_depth.txt",
+  "TunisIllumina_depth.txt",
+  "TunisONT_depth.txt"
+)
+
+labels <- c(
+  "Harash Illumina",
+  "Harash ONT",
+  "Slab Illumina",
+  "Slab ONT",
+  "Tunis Illumina",
+  "Tunis ONT"
+)
+
+dir.create("coverage_plots_stacked", showWarnings = FALSE)
+
+# Charger toutes les données
+all_data <- lapply(seq_along(files), function(i){
+
+  df <- read.table(files[i],
+                   header = FALSE,
+                   col.names = c("contig","pos","cov"))
+
+  df <- df[order(df$contig, df$pos), ]
+  df$logcov <- log10(df$cov + 1)
+  df$file <- labels[i]
+
+  df
+})
+
+df_all <- do.call(rbind, all_data)
+
+contigs <- unique(df_all$contig)
+files_u <- unique(df_all$file)
+
+nrows <- length(contigs) * length(files_u)
+
+png("coverage_plots_stacked/ALL_FILES_STACKED.png",
+    width = 1400,
+    height = 200 * nrows)
+
+par(mfrow = c(nrows,1),
+    mar = c(2,4,2,1))
+
+for(ctg in contigs){
+
+  for(f in files_u){
+
+    sub <- subset(df_all, contig == ctg & file == f)
+
+    plot(sub$pos,
+         sub$logcov,
+         type = "l",
+         lwd = 1,
+         xlab = "",
+         ylab = "log10(Cov+1)",
+         main = paste(f, "-", ctg))
+  }
+}
+
+dev.off()
 ```
 
 ### 5.2. Nanopore raw read analysis of genomic island–forming genes to assess potential Illumina correction artifacts
